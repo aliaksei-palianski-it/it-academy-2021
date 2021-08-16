@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 
 const val EXTRA_MESSAGE = "EXTRA_MESSAGE"
@@ -13,17 +14,24 @@ class MainActivity : AppCompatActivity(
     R.layout.activity_main
 ), MainActivityInteractionContract {
 
+    val viewModel = viewModels<SharedViewModel>()
+
+    val temporaryValue: String? = null;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .replace(
                     R.id.container,
-                    MainFragment()
-                ).commit()
+                    MainFragment.createInstance("Hello fragments!")
+                ).commitNow()
         }
+
+        viewModel.value.setTitle("Live data and View Model")
     }
 
     private val startForResult =
