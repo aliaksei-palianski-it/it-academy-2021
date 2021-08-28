@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity(
     R.layout.activity_main
 ), MainActivityInteractionContract {
 
-    val viewModel = viewModels<SharedViewModel>()
+    private val viewModel = viewModels<SharedViewModel>()
 
     val temporaryValue: String? = null;
 
@@ -65,9 +65,19 @@ class MainActivity : AppCompatActivity(
             .replace(R.id.container, MainFragment())
             .commit()
     }
+
+    override fun startRecyclerExample() {
+        startActivity(Intent(this, RecyclerActivity::class.java))
+    }
+
+    override fun startListExample() {
+        startActivity(Intent(this, ListActivity::class.java))
+    }
 }
 
 interface MainActivityInteractionContract {
     fun startForResult()
     fun navigateToMainFragment()
+    fun startRecyclerExample()
+    fun startListExample()
 }

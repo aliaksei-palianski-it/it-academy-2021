@@ -16,8 +16,8 @@ class MainFragment : Fragment(
     R.layout.fragment_main
 ), MainFragmentInteractionContract {
 
-    val viewModel = activityViewModels<SharedViewModel>()
-    val sharedViewModel = viewModels<MainViewModel>()
+    private val viewModel = activityViewModels<SharedViewModel>()
+    private val sharedViewModel = viewModels<MainViewModel>()
 
     companion object {
         fun createInstance(input: String): Fragment {
@@ -53,6 +53,14 @@ class MainFragment : Fragment(
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container, SecondFragment())
                 .commit()
+        }
+
+        recyclerViewEx?.setOnClickListener {
+            (activity as? MainActivityInteractionContract)?.startRecyclerExample()
+        }
+
+        listViewEx?.setOnClickListener {
+            (activity as? MainActivityInteractionContract)?.startListExample()
         }
 
         setFragmentResultListener(RESULT_MAIN_FRAGMENT) { _, bundle ->
