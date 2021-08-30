@@ -4,6 +4,7 @@ data class Item(
     val id: Int,
     val firstName: String,
     val lastName: String,
+    val type: String = "none",
 ) {
     companion object {
         fun generate(): List<Item> {
