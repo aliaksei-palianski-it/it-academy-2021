@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_recycler.*
 
@@ -31,17 +32,11 @@ class RecyclerActivity : AppCompatActivity(R.layout.activity_recycler) {
             list,
             ::removeElementListener
         )
-    }
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Any>() {
-
-        override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-            TODO("Not yet implemented")
-        }
+        //example with DiffUtils
+        //   val adapterWithDiffer = ItemDiffAdapter()
+        //   recyclerView.adapter = adapterWithDiffer
+        //   adapterWithDiffer.submitList(list)
     }
 
     private fun removeElementListener(id: Int) {
@@ -57,6 +52,40 @@ class RecyclerActivity : AppCompatActivity(R.layout.activity_recycler) {
         (recyclerView.adapter as? ItemAdapter)?.apply {
             itemList = newList
             notifyItemRemoved(itemPosition)
+        }
+    }
+}
+
+private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Item>() {
+
+    override fun areItemsTheSame(oldItem: Item, newItem: Item) = oldItem.id == newItem.id
+
+
+    override fun areContentsTheSame(oldItem: Item, newItem: Item) = oldItem == newItem
+}
+
+class ItemDiffAdapter : ListAdapter<Item, ItemDiffAdapter.ItemViewHolder>(DIFF_CALLBACK) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ItemViewHolder(
+            LayoutInflater.from(
+                parent.context
+            ).inflate(R.layout.view_item, parent, false)
+        )
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+
+    class ItemViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
+
+        private val firstNameView: TextView = view.findViewById(R.id.firstName)
+        private val lastNameView: TextView = view.findViewById(R.id.lastName)
+
+        fun bind(item: Item) {
+            firstNameView.text = item.firstName
+            lastNameView.text = item.lastName
         }
     }
 }
