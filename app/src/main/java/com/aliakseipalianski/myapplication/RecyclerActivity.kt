@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_recycler.*
+import java.util.concurrent.Executors
 
 class RecyclerActivity : AppCompatActivity(R.layout.activity_recycler) {
 
@@ -32,6 +33,8 @@ class RecyclerActivity : AppCompatActivity(R.layout.activity_recycler) {
             list,
             ::removeElementListener
         )
+
+        Executors.newCachedThreadPool()
 
         //example with DiffUtils
         //   val adapterWithDiffer = ItemDiffAdapter()

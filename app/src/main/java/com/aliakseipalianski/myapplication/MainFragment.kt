@@ -63,6 +63,10 @@ class MainFragment : Fragment(
             (activity as? MainActivityInteractionContract)?.startListExample()
         }
 
+        networkEx?.setOnClickListener {
+            (activity as? MainActivityInteractionContract)?.startNetworkExample()
+        }
+
         setFragmentResultListener(RESULT_MAIN_FRAGMENT) { _, bundle ->
             bundle.getString(EXTRA_FRAGMENT_RESULT_MESSAGE)?.let {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()

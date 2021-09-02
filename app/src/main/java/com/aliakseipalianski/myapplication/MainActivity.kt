@@ -73,6 +73,10 @@ class MainActivity : AppCompatActivity(
     override fun startListExample() {
         startActivity(Intent(this, ListActivity::class.java))
     }
+
+    override fun startNetworkExample() {
+        startActivity(Intent(this, NetworkActivity::class.java))
+    }
 }
 
 interface MainActivityInteractionContract {
@@ -80,4 +84,5 @@ interface MainActivityInteractionContract {
     fun navigateToMainFragment()
     fun startRecyclerExample()
     fun startListExample()
+    fun startNetworkExample()
 }
