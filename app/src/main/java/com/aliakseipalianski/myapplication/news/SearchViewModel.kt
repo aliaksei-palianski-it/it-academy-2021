@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
-
+    val searchHistory = mutableListOf<String>()
     private val searchNewsRepository = SearchNewsRepository(App.httpClient)
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         _errorLiveData.postValue(t.toString())
@@ -36,6 +36,8 @@ class SearchViewModel : ViewModel() {
         searchJob = viewModelScope.launch(exceptionHandler) {
             delay(1000)
             val newsResponse = searchNewsRepository.search(text.toString())
+            if(text.isNotEmpty())
+                searchHistory.add(text.toString())
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
             } ?: run {

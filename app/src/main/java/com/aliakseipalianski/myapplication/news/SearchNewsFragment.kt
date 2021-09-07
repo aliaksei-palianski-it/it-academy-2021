@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
 import kotlinx.android.synthetic.main.framgent_news_search.*
 
@@ -21,10 +23,9 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
-            //TODO set data to recycler view
+            updateRecyclerView(viewModel.value.searchHistory as ArrayList<String>)
             // it.reduce { acc, any -> acc.toString() + any.toString() }.let { data ->
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-            //  }
         }
 
         viewModel.value.errorLiveData.observe(viewLifecycleOwner) {
@@ -38,5 +39,14 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
                 }
             }
         }
+    }
+
+    private fun updateRecyclerView(searchHistory: ArrayList<String>) {
+        val layoutManager: RecyclerView.LayoutManager =
+            LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        val userRecycle: RecyclerView? = view?.findViewById(R.id.history_recycler_view)
+        userRecycle?.layoutManager = layoutManager
+        val userAdapter = HistoryAdapter(searchHistory)
+        userRecycle?.adapter = userAdapter
     }
 }

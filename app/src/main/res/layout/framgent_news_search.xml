@@ -9,12 +9,22 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:autofillHints="search"
+        android:hint="@string/input"
         android:paddingHorizontal="16dp"
         android:paddingTop="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/history_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:scrollbarSize="0dp"
+        android:scrollbars="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/newsRecycler"
@@ -26,6 +36,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchInput" />
+        app:layout_constraintTop_toBottomOf="@+id/history_recycler_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
