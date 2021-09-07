@@ -17,8 +17,6 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
     private val viewModel = viewModels<SearchViewModel>()
 
-    private val history = ArrayList<String>()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -33,13 +31,15 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
         }
 
-        viewModel.value.historyLiveData.observe(viewLifecycleOwner) {
-            for (query in it) {
-                if (!history.contains(query)) {
-                    history.add(query)
-                    historyRecycler.adapter?.notifyItemInserted(history.size - 1)
+        viewModel.value.historyLiveData.observe(viewLifecycleOwner) { history ->
+            historyRecycler.adapter?.let {
+                val adapter = it as HistoryRecyclerViewAdapter
+                adapter.updateValues(history)
+                historyRecycler.scrollToPosition(0)
+                if (adapter.itemCount > 0)
                     clearHistory.visibility = View.VISIBLE
-                }
+                else
+                    clearHistory.visibility = View.GONE
             }
         }
 
@@ -53,19 +53,13 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         setupHistoryRecyclerView()
 
-        clearHistory.setOnClickListener(onClearClicked)
-    }
-
-    private val onClearClicked = View.OnClickListener {
-        clearHistory.visibility = View.GONE
-        viewModel.value.clearHistory()
-        val size = history.size
-        history.clear()
-        historyRecycler.adapter?.notifyItemRangeRemoved(0, size)
+        clearHistory.setOnClickListener {
+            viewModel.value.clearHistory()
+        }
     }
 
     private fun setupHistoryRecyclerView() {
-        historyRecycler.adapter = HistoryRecyclerViewAdapter(history) { itemView ->
+        historyRecycler.adapter = HistoryRecyclerViewAdapter { itemView ->
             val query = itemView.tag as String
             searchInput.setText(query)
         }

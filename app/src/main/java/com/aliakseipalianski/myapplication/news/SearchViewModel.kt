@@ -53,15 +53,18 @@ class SearchViewModel : ViewModel() {
     private fun addToHistory(query: String) {
         if (query.isBlank()) return
         _historyLiveData.value?.let { history ->
-            if (!history.contains(query)) {
-                history.add(query)
-                _historyLiveData.postValue(history)
-            }
+            if (history.contains(query))
+                history.remove(query)
+            history.add(0, query)
+            _historyLiveData.postValue(history)
         } ?: _historyLiveData.postValue(arrayListOf(query))
     }
 
     fun clearHistory() {
-        _historyLiveData.value?.clear()
+        _historyLiveData.value?.let {
+            it.clear()
+            _historyLiveData.postValue(it)
+        }
     }
 
     /*

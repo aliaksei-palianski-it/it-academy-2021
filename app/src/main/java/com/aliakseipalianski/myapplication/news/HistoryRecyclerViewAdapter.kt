@@ -6,11 +6,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.databinding.SearchQueryItemBinding
+import androidx.recyclerview.widget.DiffUtil
+
 
 class HistoryRecyclerViewAdapter(
-    private val values: List<String>,
     private val onClickListener: View.OnClickListener
 ) : RecyclerView.Adapter<HistoryRecyclerViewAdapter.ViewHolder>() {
+
+    private val values = ArrayList<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -29,6 +32,14 @@ class HistoryRecyclerViewAdapter(
             tag = query
             setOnClickListener(onClickListener)
         }
+    }
+
+    fun updateValues(newValues: ArrayList<String>) {
+        val historyDiffUtilCallback = HistoryDiffUtilCallback(values, newValues)
+        val historyDiffResult = DiffUtil.calculateDiff(historyDiffUtilCallback, true)
+        values.clear()
+        values.addAll(newValues)
+        historyDiffResult.dispatchUpdatesTo(this)
     }
 
     override fun getItemCount() = values.size

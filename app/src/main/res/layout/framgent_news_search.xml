@@ -29,8 +29,6 @@
         app:layout_constraintEnd_toStartOf="@+id/clearHistory"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchInput"
-        app:reverseLayout="true"
-        app:stackFromEnd="true"
         tools:listitem="@layout/search_query_item" />
 
     <ImageView
