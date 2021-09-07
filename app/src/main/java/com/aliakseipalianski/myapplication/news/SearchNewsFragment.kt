@@ -38,6 +38,7 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
                 if (!history.contains(query)) {
                     history.add(query)
                     historyRecycler.adapter?.notifyItemInserted(history.size - 1)
+                    clearHistory.visibility = View.VISIBLE
                 }
             }
         }
@@ -51,6 +52,16 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
         }
 
         setupHistoryRecyclerView()
+
+        clearHistory.setOnClickListener(onClearClicked)
+    }
+
+    private val onClearClicked = View.OnClickListener {
+        clearHistory.visibility = View.GONE
+        viewModel.value.clearHistory()
+        val size = history.size
+        history.clear()
+        historyRecycler.adapter?.notifyItemRangeRemoved(0, size)
     }
 
     private fun setupHistoryRecyclerView() {

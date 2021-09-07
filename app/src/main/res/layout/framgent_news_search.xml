@@ -24,14 +24,27 @@
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
-        app:reverseLayout="true"
-        app:stackFromEnd="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/clearHistory"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchInput"
+        app:reverseLayout="true"
+        app:stackFromEnd="true"
         tools:listitem="@layout/search_query_item" />
+
+    <ImageView
+        android:id="@+id/clearHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/historyRecycler"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput"
+        app:srcCompat="@drawable/ic_round_clear_24" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/newsRecycler"

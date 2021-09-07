@@ -60,6 +60,10 @@ class SearchViewModel : ViewModel() {
         } ?: _historyLiveData.postValue(arrayListOf(query))
     }
 
+    fun clearHistory() {
+        _historyLiveData.value?.clear()
+    }
+
     /*
      fun searchRx(text: CharSequence) {
          searchNewsRepository.searchRx(text.toString())
