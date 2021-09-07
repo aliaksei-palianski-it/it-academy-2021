@@ -24,6 +24,8 @@
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
+        app:reverseLayout="true"
+        app:stackFromEnd="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
         app:layout_constraintEnd_toEndOf="parent"
