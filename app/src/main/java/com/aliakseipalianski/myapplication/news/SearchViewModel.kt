@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
 
-    private val searchNewsRepository = SearchNewsRepository(App.httpClient)
+    private val searchNewsRepository = SearchNewsRepository(App.searchService)
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         _errorLiveData.postValue(t.toString())
     }
 
-    private val _searchLiveData = MutableLiveData<String>()
-    val searchLiveData: LiveData<String> get() = _searchLiveData
+    private val _searchLiveData = MutableLiveData<List<NewsItem>>()
+    val searchLiveData: LiveData<List<NewsItem>> get() = _searchLiveData
 
     private val _errorLiveData = MutableLiveData<String>()
     val errorLiveData: LiveData<String> get() = _errorLiveData

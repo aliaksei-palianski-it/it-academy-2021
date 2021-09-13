@@ -1,6 +1,7 @@
 package com.aliakseipalianski.myapplication.news
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
@@ -21,15 +22,15 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
-            //TODO set data to recycler view
-            // it.reduce { acc, any -> acc.toString() + any.toString() }.let { data ->
-            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-            //  }
+            (newsRecycler.adapter as? SearchNewsAdapter)?.submitList(it)
         }
 
         viewModel.value.errorLiveData.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            Log.d("error", it)
         }
+
+        newsRecycler.adapter = SearchNewsAdapter()
 
         viewModel.value.historyLiveData.observe(viewLifecycleOwner) { history ->
             historyRecycler.adapter?.let {
