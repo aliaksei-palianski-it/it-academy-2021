@@ -12,7 +12,8 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
 
-    private val searchNewsRepository = SearchNewsRepository(App.searchService)
+    private val searchNewsRepository =
+        SearchNewsRepository(App.searchService, App.getRecentlySearchedDao())
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         _errorLiveData.postValue(t.toString())
     }
@@ -23,8 +24,8 @@ class SearchViewModel : ViewModel() {
     private val _errorLiveData = MutableLiveData<String>()
     val errorLiveData: LiveData<String> get() = _errorLiveData
 
-    private val _historyLiveData = MutableLiveData<ArrayList<String>>()
-    val historyLiveData: LiveData<ArrayList<String>> get() = _historyLiveData
+    private val _historyLiveData = MutableLiveData<List<String>>()
+    val historyLiveData: LiveData<List<String>> get() = _historyLiveData
 
     private var searchJob: Job? = null
 
@@ -41,7 +42,11 @@ class SearchViewModel : ViewModel() {
             val newsResponse = searchNewsRepository.search(text.toString())
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
-                addToHistory(text.toString().trim())
+                _historyLiveData.postValue(
+                    searchNewsRepository.addQueryToRecentlySearched(
+                        text.toString().trim()
+                    )
+                )
             } ?: run {
                 _errorLiveData.postValue(
                     newsResponse.exceptionOrNull()?.message ?: "unexpected exception"
@@ -50,32 +55,18 @@ class SearchViewModel : ViewModel() {
         }
     }
 
-    private fun addToHistory(query: String) {
-        if (query.isBlank()) return
-        _historyLiveData.value?.let { history ->
-            if (history.contains(query))
-                history.remove(query)
-            history.add(0, query)
-            _historyLiveData.postValue(history)
-        } ?: _historyLiveData.postValue(arrayListOf(query))
+    fun getRecentlySearched() {
+        viewModelScope.launch(exceptionHandler) {
+            _historyLiveData.postValue(searchNewsRepository.getAll())
+        }
     }
 
     fun clearHistory() {
         _historyLiveData.value?.let {
-            it.clear()
-            _historyLiveData.postValue(it)
+            it.toMutableList().let { mutable ->
+                mutable.clear()
+                _historyLiveData.postValue(mutable)
+            }
         }
     }
-
-    /*
-     fun searchRx(text: CharSequence) {
-         searchNewsRepository.searchRx(text.toString())
-             .subscribeOn(Schedulers.io())
-             .observeOn(AndroidSchedulers.mainThread())
-             .doOnSuccess {
-                 _searchLiveData.postValue(it)
-             }
-             .doOnError { }
-     }
- */
 }

@@ -21,6 +21,10 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (savedInstanceState == null) {
+            viewModel.value.getRecentlySearched()
+        }
+
         viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
             (newsRecycler.adapter as? SearchNewsAdapter)?.submitList(it)
         }
