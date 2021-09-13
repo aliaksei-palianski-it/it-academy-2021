@@ -32,12 +32,37 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         newsRecycler.adapter = SearchNewsAdapter()
 
+        viewModel.value.historyLiveData.observe(viewLifecycleOwner) { history ->
+            historyRecycler.adapter?.let {
+                val adapter = it as HistoryRecyclerViewAdapter
+                adapter.updateValues(history)
+                historyRecycler.scrollToPosition(0)
+                if (adapter.itemCount > 0)
+                    clearHistory.visibility = View.VISIBLE
+                else
+                    clearHistory.visibility = View.GONE
+            }
+        }
+
         searchInput.doOnTextChanged { text, _, _, count ->
             text?.let {
                 if (text.length > 2) {
                     viewModel.value.search(text)
                 }
             }
+        }
+
+        setupHistoryRecyclerView()
+
+        clearHistory.setOnClickListener {
+            viewModel.value.clearHistory()
+        }
+    }
+
+    private fun setupHistoryRecyclerView() {
+        historyRecycler.adapter = HistoryRecyclerViewAdapter { itemView ->
+            val query = itemView.tag as String
+            searchInput.setText(query)
         }
     }
 }

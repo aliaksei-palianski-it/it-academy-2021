@@ -23,6 +23,9 @@ class SearchViewModel : ViewModel() {
     private val _errorLiveData = MutableLiveData<String>()
     val errorLiveData: LiveData<String> get() = _errorLiveData
 
+    private val _historyLiveData = MutableLiveData<ArrayList<String>>()
+    val historyLiveData: LiveData<ArrayList<String>> get() = _historyLiveData
+
     private var searchJob: Job? = null
 
     override fun onCleared() {
@@ -38,11 +41,29 @@ class SearchViewModel : ViewModel() {
             val newsResponse = searchNewsRepository.search(text.toString())
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
+                addToHistory(text.toString().trim())
             } ?: run {
                 _errorLiveData.postValue(
                     newsResponse.exceptionOrNull()?.message ?: "unexpected exception"
                 )
             }
+        }
+    }
+
+    private fun addToHistory(query: String) {
+        if (query.isBlank()) return
+        _historyLiveData.value?.let { history ->
+            if (history.contains(query))
+                history.remove(query)
+            history.add(0, query)
+            _historyLiveData.postValue(history)
+        } ?: _historyLiveData.postValue(arrayListOf(query))
+    }
+
+    fun clearHistory() {
+        _historyLiveData.value?.let {
+            it.clear()
+            _historyLiveData.postValue(it)
         }
     }
 
