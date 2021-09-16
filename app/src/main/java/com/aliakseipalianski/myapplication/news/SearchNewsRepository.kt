@@ -49,7 +49,7 @@ class SearchNewsRepository(
         } ?: arrayListOf(query)
     }
 
-    suspend fun getAll(): List<String> {
+    suspend fun getAllRecentlySearched(): List<String> {
         if (recentlySearchedList == null) {
 
             recentlySearchedList = withContext(Dispatchers.IO) {

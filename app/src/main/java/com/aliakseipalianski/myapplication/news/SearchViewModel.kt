@@ -57,7 +57,7 @@ class SearchViewModel : ViewModel() {
 
     fun getRecentlySearched() {
         viewModelScope.launch(exceptionHandler) {
-            _historyLiveData.postValue(searchNewsRepository.getAll())
+            _historyLiveData.postValue(searchNewsRepository.getAllRecentlySearched())
         }
     }
 
