@@ -22,21 +22,35 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
         super.onViewCreated(view, savedInstanceState)
 
         if (savedInstanceState == null) {
-            viewModel.value.getRecentlySearched()
+            viewModel.value.onNewIntent(NewsActivityIntent.LoadHistoryActivityIntent)
         }
 
-        viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
-            (newsRecycler.adapter as? SearchNewsAdapter)?.submitList(it)
-        }
-
-        viewModel.value.errorLiveData.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-            Log.d("error", it)
-        }
+        viewModel.value.state.observe(viewLifecycleOwner, ::handleNewState)
 
         newsRecycler.adapter = SearchNewsAdapter()
 
-        viewModel.value.historyLiveData.observe(viewLifecycleOwner) { history ->
+
+        searchInput.doOnTextChanged { text, _, _, count ->
+            text?.let {
+                if (text.length > 2) {
+                    viewModel.value.onNewIntent(NewsActivityIntent.LoadNewsActivityIntent(text.toString()))
+                }
+            }
+        }
+
+        setupHistoryRecyclerView()
+
+        clearHistory.setOnClickListener {
+            viewModel.value.onNewIntent(NewsActivityIntent.ClearHistoryActivityIntent)
+        }
+    }
+
+    private fun handleNewState(state: SearchViewModel.NewsActivityState) {
+        state.newsList?.let {
+            (newsRecycler.adapter as? SearchNewsAdapter)?.submitList(it)
+        }
+
+        state.historyList?.let { history ->
             historyRecycler.adapter?.let {
                 val adapter = it as HistoryRecyclerViewAdapter
                 adapter.updateValues(history)
@@ -48,18 +62,9 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
             }
         }
 
-        searchInput.doOnTextChanged { text, _, _, count ->
-            text?.let {
-                if (text.length > 2) {
-                    viewModel.value.search(text)
-                }
-            }
-        }
-
-        setupHistoryRecyclerView()
-
-        clearHistory.setOnClickListener {
-            viewModel.value.clearHistory()
+        state.error?.let {
+            Toast.makeText(requireContext(), it.toString(), Toast.LENGTH_LONG).show()
+            Log.d("error", it.toString())
         }
     }
 

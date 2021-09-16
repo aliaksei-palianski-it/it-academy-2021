@@ -10,22 +10,28 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+sealed class NewsActivityIntent {
+    class LoadNewsActivityIntent(val query: String) : NewsActivityIntent()
+    object LoadHistoryActivityIntent : NewsActivityIntent()
+    object ClearHistoryActivityIntent : NewsActivityIntent()
+}
+
 class SearchViewModel : ViewModel() {
 
     private val searchNewsRepository =
         SearchNewsRepository(App.searchService, App.getRecentlySearchedDao())
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
-        _errorLiveData.postValue(t.toString())
+        _stateLiveData.postValue(NewsActivityState(error = t.toString()))
     }
 
-    private val _searchLiveData = MutableLiveData<List<NewsItem>>()
-    val searchLiveData: LiveData<List<NewsItem>> get() = _searchLiveData
+    data class NewsActivityState(
+        val newsList: List<NewsItem>? = null,
+        val error: Any? = null,
+        val historyList: List<String>? = null,
+    )
 
-    private val _errorLiveData = MutableLiveData<String>()
-    val errorLiveData: LiveData<String> get() = _errorLiveData
-
-    private val _historyLiveData = MutableLiveData<List<String>>()
-    val historyLiveData: LiveData<List<String>> get() = _historyLiveData
+    private val _stateLiveData = MutableLiveData<NewsActivityState>()
+    val state: LiveData<NewsActivityState> get() = _stateLiveData
 
     private var searchJob: Job? = null
 
@@ -35,38 +41,56 @@ class SearchViewModel : ViewModel() {
         searchJob = null
     }
 
-    fun search(text: CharSequence) {
+    fun onNewIntent(intent: NewsActivityIntent) {
+        when (intent) {
+            is NewsActivityIntent.LoadNewsActivityIntent -> search(intent.query)
+            is NewsActivityIntent.LoadHistoryActivityIntent -> getRecentlySearched()
+            is NewsActivityIntent.ClearHistoryActivityIntent -> clearHistory()
+        }
+    }
+
+    private fun search(text: CharSequence) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch(exceptionHandler) {
             delay(1000)
             val newsResponse = searchNewsRepository.search(text.toString())
             newsResponse.getOrNull()?.let {
-                _searchLiveData.postValue(it)
-                _historyLiveData.postValue(
-                    searchNewsRepository.addQueryToRecentlySearched(
-                        text.toString().trim()
-                    )
+                _stateLiveData.postValue(
+                    NewsActivityState(
+                        newsList = it,
+                        historyList = searchNewsRepository.addQueryToRecentlySearched(
+                            text.toString().trim()
+                        )
+                    ),
                 )
             } ?: run {
-                _errorLiveData.postValue(
-                    newsResponse.exceptionOrNull()?.message ?: "unexpected exception"
+                _stateLiveData.postValue(
+                    NewsActivityState(
+                        error = newsResponse.exceptionOrNull()?.message ?: "unexpected exception"
+                    )
                 )
             }
         }
     }
 
-    fun getRecentlySearched() {
+    private fun getRecentlySearched() {
         viewModelScope.launch(exceptionHandler) {
-            _historyLiveData.postValue(searchNewsRepository.getAllRecentlySearched())
+            _stateLiveData.postValue(
+                NewsActivityState(
+                    historyList = searchNewsRepository.getAllRecentlySearched()
+                ),
+            )
         }
     }
 
-    fun clearHistory() {
-        _historyLiveData.value?.let {
-            it.toMutableList().let { mutable ->
-                mutable.clear()
-                _historyLiveData.postValue(mutable)
-            }
+    private fun clearHistory() {
+        viewModelScope.launch(exceptionHandler) {
+            searchNewsRepository.clearRecentlySearched()
+            _stateLiveData.postValue(
+                NewsActivityState(
+                    historyList = searchNewsRepository.getAllRecentlySearched()
+                ),
+            )
         }
     }
 }

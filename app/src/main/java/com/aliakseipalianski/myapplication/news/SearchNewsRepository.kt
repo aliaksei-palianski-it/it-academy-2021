@@ -59,4 +59,8 @@ class SearchNewsRepository(
 
         return recentlySearchedList ?: emptyList()
     }
+
+    fun clearRecentlySearched() {
+        recentlySearchedList = emptyList()
+    }
 }
