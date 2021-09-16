@@ -1,65 +1,53 @@
 package com.aliakseipalianski.myapplication
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
-const val EXTRA_MESSAGE = "EXTRA_MESSAGE"
 
 class MainActivity : AppCompatActivity(
     R.layout.activity_main
-), MainActivityInteractionContract {
+), IMainView {
+
+    private var presenter: MainPresenter = MainPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.container,
-                    MainFragment()
-                ).commit()
+        presenter.bind(this)
+
+        text.setOnClickListener {
+            presenter.onTextButtonClicked()
         }
     }
 
-    private val startForResult =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.getStringExtra(EXTRA_MESSAGE)?.let { message ->
-                    when (val fragment = supportFragmentManager.findFragmentById(R.id.container)) {
-                        is MainFragment -> fragment.handleResult(message)
-                        else -> Log.d(
-                            MainActivity::class.java.name,
-                            "cannot find fragment"
-                        )
-                    }
-                }
-            }
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isFinishing) {
+            // remove presenter from some presenter store
         }
 
-    override fun startForResult() {
-        startForResult.launch(
-            Intent(
-                this,
-                SecondActivity::class.java
-            )
-        )
+        presenter.unbind()
     }
 
-    override fun navigateToMainFragment() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, MainFragment())
-            .commit()
+    override fun showError() {
+        //show some error
+    }
+
+    override fun showView(arg: SomeModel) {
+        // show default state
+    }
+
+    override fun showList(arg: List<*>) {
+        // show some list
     }
 }
 
-interface MainActivityInteractionContract {
-    fun startForResult()
-    fun navigateToMainFragment()
+interface IMainView {
+    fun showError()
+
+    fun showView(arg: SomeModel)
+
+    fun showList(arg: List<*>)
 }
