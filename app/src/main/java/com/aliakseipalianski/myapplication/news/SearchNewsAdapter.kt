@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
 import com.bumptech.glide.Glide
 
-class SearchNewsAdapter :
+class SearchNewsAdapter(
+    private val onClickListener: View.OnClickListener
+) :
     ListAdapter<NewsItem, SearchNewsAdapter.SearchNewsItemViewHolder>(SearchNewsItemDiff) {
 
     override fun onCreateViewHolder(
@@ -29,7 +31,7 @@ class SearchNewsAdapter :
         holder: SearchNewsItemViewHolder,
         position: Int
     ) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), onClickListener)
     }
 
     class SearchNewsItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -40,7 +42,7 @@ class SearchNewsAdapter :
         private val author: TextView = view.findViewById(R.id.itemAuthor)
         private val date: TextView = view.findViewById(R.id.itemDate)
 
-        fun bind(item: NewsItem) {
+        fun bind(item: NewsItem, onClickListener: View.OnClickListener) {
             author.text = item.author
             description.text = item.description
             date.text = item.publishedAt
@@ -52,6 +54,11 @@ class SearchNewsAdapter :
                 .fallback(R.mipmap.ic_launcher)
                 .placeholder(R.mipmap.ic_launcher_round)
                 .into(poster)
+
+            with(itemView) {
+                tag = item.url
+                setOnClickListener(onClickListener)
+            }
         }
     }
 }

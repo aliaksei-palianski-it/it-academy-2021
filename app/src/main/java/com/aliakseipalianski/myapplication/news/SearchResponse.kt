@@ -27,6 +27,7 @@ data class SearchItem(
         description,
         urlToImage,
         dateFormat.format(publishedAt),
+        url
     )
 }
 
