@@ -15,4 +15,10 @@ interface NewsService {
         @Query("sortBy") sort: String = "popularity",
         @Query("apiKey") apiKey: String = API_KEY,
     ): Deferred<Response<SearchResponse>>
+
+    @GET("v2/top-headlines")
+    fun topHeadlinesAsync(
+        @Query("category") category: String = "technology",
+        @Query("apiKey") apiKey: String = API_KEY
+    ): Deferred<Response<SearchResponse>>
 }

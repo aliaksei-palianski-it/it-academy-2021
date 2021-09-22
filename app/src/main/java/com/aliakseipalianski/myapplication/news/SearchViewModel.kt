@@ -39,7 +39,13 @@ class SearchViewModel : ViewModel() {
         searchJob?.cancel()
         searchJob = viewModelScope.launch(exceptionHandler) {
             delay(1000)
-            val newsResponse = searchNewsRepository.search(text.toString())
+
+            val newsResponse = if (text.isBlank()) {
+                searchNewsRepository.topHeadlines()
+            } else {
+                searchNewsRepository.search(text.toString())
+            }
+
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
                 _historyLiveData.postValue(

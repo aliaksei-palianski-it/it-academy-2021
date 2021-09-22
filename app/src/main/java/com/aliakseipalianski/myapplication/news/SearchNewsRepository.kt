@@ -30,6 +30,20 @@ class SearchNewsRepository(
         }
     }
 
+    suspend fun topHeadlines(): Result<List<NewsItem>> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                newsService.topHeadlinesAsync()
+                    .await()
+                    .takeIf { it.isSuccessful }
+                    ?.body()
+                    ?.articleList?.map {
+                        it.toNewsItem(simpleDateFormat)
+                    } ?: throw Exception("Empty data")
+            }
+        }
+    }
+
     suspend fun addQueryToRecentlySearched(query: String): List<String> =
         withContext(Dispatchers.IO) {
             recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
