@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 

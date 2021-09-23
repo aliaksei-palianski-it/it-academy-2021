@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view.adapter
 
 import android.view.LayoutInflater
 import android.view.View

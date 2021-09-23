@@ -1,7 +1,8 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
-import com.aliakseipalianski.myapplication.news.database.RecentlySearchedDao
-import com.aliakseipalianski.myapplication.news.database.RecentlySearchedItem
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
+import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedDao
+import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat

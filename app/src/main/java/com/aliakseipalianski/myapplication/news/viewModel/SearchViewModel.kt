@@ -1,10 +1,11 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aliakseipalianski.myapplication.App
+import com.aliakseipalianski.myapplication.common.App
+import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

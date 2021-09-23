@@ -1,5 +1,6 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
+import com.aliakseipalianski.myapplication.news.model.SearchResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.GET

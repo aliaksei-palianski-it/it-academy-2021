@@ -1,5 +1,6 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
