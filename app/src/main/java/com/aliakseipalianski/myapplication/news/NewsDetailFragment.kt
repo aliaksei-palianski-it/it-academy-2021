@@ -2,7 +2,9 @@ package com.aliakseipalianski.myapplication.news
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.os.bundleOf
 import com.aliakseipalianski.myapplication.R
@@ -32,11 +34,26 @@ class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         url?.let {
             with(webView) {
                 settings.javaScriptEnabled = true
                 loadUrl(it)
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) =
+        if (item.itemId == android.R.id.home) {
+            onHomeAsUpSelected()
+        } else {
+            super.onOptionsItemSelected(item)
+        }
+
+    private fun onHomeAsUpSelected(): Boolean {
+        parentFragmentManager.popBackStack()
+        return true
     }
 }
