@@ -35,16 +35,16 @@ class SearchViewModel : ViewModel() {
         searchJob = null
     }
 
-    fun search(text: CharSequence) {
+    fun search(text: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch(exceptionHandler) {
             delay(1000)
-            val newsResponse = searchNewsRepository.search(text.toString())
+            val newsResponse = searchNewsRepository.search(text)
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
                 _historyLiveData.postValue(
                     searchNewsRepository.addQueryToRecentlySearched(
-                        text.toString().trim()
+                        text.trim()
                     )
                 )
             } ?: run {
