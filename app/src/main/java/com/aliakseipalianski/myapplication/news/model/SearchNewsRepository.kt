@@ -31,17 +31,31 @@ class SearchNewsRepository(
         }
     }
 
-    suspend fun addQueryToRecentlySearched(query: String): List<String> =
-        withContext(Dispatchers.IO) {
-            recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
-            insertInMemory(query)
-
-            return@withContext recentlySearchedList ?: emptyList()
+    suspend fun topHeadlines(): Result<List<NewsItem>> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                newsService.topHeadlinesAsync()
+                    .await()
+                    .takeIf { it.isSuccessful }
+                    ?.body()
+                    ?.articleList?.map {
+                        it.toNewsItem(simpleDateFormat)
+                    } ?: throw Exception("Empty data")
+            }
         }
+    }
+
+    suspend fun addQueryToRecentlySearched(query: String): List<String> {
+        if (query.isNotBlank())
+            withContext(Dispatchers.IO) {
+                insertInMemory(query)
+                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+            }
+
+        return recentlySearchedList ?: emptyList()
+    }
 
     private fun insertInMemory(query: String) {
-        if (query.isBlank()) return
-
         recentlySearchedList = recentlySearchedList?.toMutableList()?.let { history ->
             if (history.contains(query))
                 history.remove(query)

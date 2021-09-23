@@ -26,6 +26,7 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         if (savedInstanceState == null) {
             viewModel.value.getRecentlySearched()
+            viewModel.value.search("")
         }
 
         viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
@@ -53,7 +54,7 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         searchInput.doOnTextChanged { text, _, _, count ->
             text?.let {
-                if (count > 2) {
+                if (count > 2 || text.isBlank()) {
                     viewModel.value.search(text.toString())
                 }
             }
