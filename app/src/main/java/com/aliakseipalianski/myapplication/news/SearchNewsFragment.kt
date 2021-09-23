@@ -51,8 +51,8 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         searchInput.doOnTextChanged { text, _, _, count ->
             text?.let {
-                if (text.length > 2 || text.isBlank()) {
-                    viewModel.value.search(text)
+                if (count > 2 || text.isBlank()) {
+                    viewModel.value.search(text.toString())
                 }
             }
         }
