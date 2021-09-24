@@ -7,9 +7,11 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.os.bundleOf
+import com.aliakseipalianski.myapplication.BuildConfig
 import com.aliakseipalianski.myapplication.R
 import kotlinx.android.synthetic.main.fragment_news_detail.*
 
@@ -59,6 +61,12 @@ class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
 
                 settings.javaScriptEnabled = true
                 loadUrl(it)
+            }
+        } ?: run {
+            if (BuildConfig.DEBUG) {
+                throw IllegalArgumentException("url == null")
+            } else {
+                Toast.makeText(context, R.string.null_url_error, Toast.LENGTH_SHORT).show()
             }
         }
     }
