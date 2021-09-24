@@ -1,10 +1,11 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aliakseipalianski.myapplication.App
+import com.aliakseipalianski.myapplication.common.App
+import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -35,16 +36,21 @@ class SearchViewModel : ViewModel() {
         searchJob = null
     }
 
-    fun search(text: CharSequence) {
+    fun search(text: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch(exceptionHandler) {
             delay(1000)
-            val newsResponse = searchNewsRepository.search(text.toString())
+
+            val newsResponse = if (text.isBlank()) {
+                searchNewsRepository.topHeadlines()
+            } else {
+                searchNewsRepository.search(text)
+            }
             newsResponse.getOrNull()?.let {
                 _searchLiveData.postValue(it)
                 _historyLiveData.postValue(
                     searchNewsRepository.addQueryToRecentlySearched(
-                        text.toString().trim()
+                        text.trim()
                     )
                 )
             } ?: run {

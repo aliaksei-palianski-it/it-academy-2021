@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

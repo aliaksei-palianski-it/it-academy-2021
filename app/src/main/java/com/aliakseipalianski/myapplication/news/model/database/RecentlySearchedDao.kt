@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news.database
+package com.aliakseipalianski.myapplication.news.model.database
 
 import androidx.room.Dao
 import androidx.room.Insert

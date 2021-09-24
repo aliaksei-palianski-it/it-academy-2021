@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.bumptech.glide.Glide
 
 class SearchNewsAdapter(

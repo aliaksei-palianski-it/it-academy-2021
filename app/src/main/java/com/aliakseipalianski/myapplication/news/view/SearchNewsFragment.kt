@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view
 
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
-import com.aliakseipalianski.myapplication.SecondFragment
+import com.aliakseipalianski.myapplication.news.viewModel.SearchViewModel
+import com.aliakseipalianski.myapplication.news.view.adapter.HistoryRecyclerViewAdapter
+import com.aliakseipalianski.myapplication.news.view.adapter.SearchNewsAdapter
 import kotlinx.android.synthetic.main.framgent_news_search.*
 
 class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
@@ -25,6 +27,7 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         if (savedInstanceState == null) {
             viewModel.value.getRecentlySearched()
+            viewModel.value.search("")
         }
 
         viewModel.value.searchLiveData.observe(viewLifecycleOwner) {
@@ -60,8 +63,8 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 
         searchInput.doOnTextChanged { text, _, _, count ->
             text?.let {
-                if (text.length > 2) {
-                    viewModel.value.search(text)
+                if (count > 2 || text.isBlank()) {
+                    viewModel.value.search(text.toString())
                 }
             }
         }

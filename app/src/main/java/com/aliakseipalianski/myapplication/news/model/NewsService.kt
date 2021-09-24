@@ -1,5 +1,6 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
+import com.aliakseipalianski.myapplication.news.model.SearchResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.GET
@@ -14,5 +15,11 @@ interface NewsService {
         @Query("q") query: String,
         @Query("sortBy") sort: String = "popularity",
         @Query("apiKey") apiKey: String = API_KEY,
+    ): Deferred<Response<SearchResponse>>
+
+    @GET("v2/top-headlines")
+    fun topHeadlinesAsync(
+        @Query("category") category: String = "technology",
+        @Query("apiKey") apiKey: String = API_KEY
     ): Deferred<Response<SearchResponse>>
 }

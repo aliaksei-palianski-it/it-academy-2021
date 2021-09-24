@@ -1,4 +1,4 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.view
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap

@@ -1,5 +1,6 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
@@ -12,22 +13,22 @@ data class SearchResponse(
 
 data class SearchItem(
     val source: Source,
-    val author: String,
-    val title: String,
-    val description: String,
-    val url: String,
-    val urlToImage: String,
-    val publishedAt: Date,
+    val author: String?,
+    val title: String?,
+    val description: String?,
+    val url: String?,
+    val urlToImage: String?,
+    val publishedAt: Date?,
     val content: String,
 ) {
     fun toNewsItem(dateFormat: SimpleDateFormat) = NewsItem(
         UUID.nameUUIDFromBytes(toString().toByteArray()).toString(),
-        author,
-        title,
-        description,
-        urlToImage,
-        dateFormat.format(publishedAt),
-        url
+        author ?: "",
+        title ?: "",
+        description ?: "",
+        urlToImage ?: "",
+        if (publishedAt != null) dateFormat.format(publishedAt) else "",
+        url ?: ""
     )
 }
 

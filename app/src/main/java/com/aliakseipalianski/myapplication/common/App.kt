@@ -1,9 +1,8 @@
-package com.aliakseipalianski.myapplication
+package com.aliakseipalianski.myapplication.common
 
 import android.app.Application
 import androidx.room.Room
-import com.aliakseipalianski.myapplication.news.NewsService
-import com.aliakseipalianski.myapplication.news.database.AppDatabase
+import com.aliakseipalianski.myapplication.news.model.NewsService
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

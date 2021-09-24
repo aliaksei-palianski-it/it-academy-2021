@@ -1,7 +1,8 @@
-package com.aliakseipalianski.myapplication.news
+package com.aliakseipalianski.myapplication.news.model
 
-import com.aliakseipalianski.myapplication.news.database.RecentlySearchedDao
-import com.aliakseipalianski.myapplication.news.database.RecentlySearchedItem
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
+import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedDao
+import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -30,17 +31,31 @@ class SearchNewsRepository(
         }
     }
 
-    suspend fun addQueryToRecentlySearched(query: String): List<String> =
-        withContext(Dispatchers.IO) {
-            recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
-            insertInMemory(query)
-
-            return@withContext recentlySearchedList ?: emptyList()
+    suspend fun topHeadlines(): Result<List<NewsItem>> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                newsService.topHeadlinesAsync()
+                    .await()
+                    .takeIf { it.isSuccessful }
+                    ?.body()
+                    ?.articleList?.map {
+                        it.toNewsItem(simpleDateFormat)
+                    } ?: throw Exception("Empty data")
+            }
         }
+    }
+
+    suspend fun addQueryToRecentlySearched(query: String): List<String> {
+        if (query.isNotBlank())
+            withContext(Dispatchers.IO) {
+                insertInMemory(query)
+                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+            }
+
+        return recentlySearchedList ?: emptyList()
+    }
 
     private fun insertInMemory(query: String) {
-        if (query.isBlank()) return
-
         recentlySearchedList = recentlySearchedList?.toMutableList()?.let { history ->
             if (history.contains(query))
                 history.remove(query)
