@@ -1,9 +1,12 @@
 package com.aliakseipalianski.myapplication.news
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.core.os.bundleOf
@@ -39,6 +42,21 @@ class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
 
         url?.let {
             with(webView) {
+                webViewClient = object : WebViewClient() {
+
+                    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                        super.onPageStarted(view, url, favicon)
+                        progressBar?.visibility = View.VISIBLE
+
+                    }
+
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        if (this@NewsDetailFragment.url == url)
+                            progressBar?.visibility = View.GONE
+                    }
+                }
+
                 settings.javaScriptEnabled = true
                 loadUrl(it)
             }
