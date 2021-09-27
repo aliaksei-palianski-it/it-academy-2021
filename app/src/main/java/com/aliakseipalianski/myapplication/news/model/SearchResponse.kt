@@ -16,7 +16,7 @@ data class SearchItem(
     val author: String?,
     val title: String?,
     val description: String?,
-    val url: String,
+    val url: String?,
     val urlToImage: String?,
     val publishedAt: Date?,
     val content: String,
@@ -27,7 +27,8 @@ data class SearchItem(
         title ?: "",
         description ?: "",
         urlToImage ?: "",
-        if (publishedAt != null) dateFormat.format(publishedAt) else ""
+        if (publishedAt != null) dateFormat.format(publishedAt) else "",
+        url ?: ""
     )
 }
 

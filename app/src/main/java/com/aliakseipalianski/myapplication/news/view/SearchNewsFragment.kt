@@ -8,6 +8,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
 import com.aliakseipalianski.myapplication.news.view.adapter.HistoryRecyclerViewAdapter
 import com.aliakseipalianski.myapplication.news.view.adapter.SearchNewsAdapter
@@ -40,7 +41,15 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
             Log.d("error", it)
         }
 
-        newsRecycler.adapter = SearchNewsAdapter()
+        newsRecycler.adapter = SearchNewsAdapter {
+            val url = it.tag
+            if (url is String && url.isNotEmpty()) {
+                parentFragmentManager.beginTransaction()
+                    .addToBackStack("SearchNewsFragment")
+                    .replace(R.id.container, NewsDetailFragment.newInstance(url))
+                    .commit()
+            }
+        }
 
         viewModel.value.historyLiveData.observe(viewLifecycleOwner) { history ->
             historyRecycler.adapter?.let {
