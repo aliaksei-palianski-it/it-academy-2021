@@ -32,7 +32,7 @@ class SearchViewModelUnitTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     private val searchNewsRepository: ISearchNewsRepository = mockk()
-    private val newsItem: NewsItem = NewsItem("", "", "", "", "", "")
+    private val newsItem: NewsItem = NewsItem("", "", "", "", "", "", "")
     private val successResult = Result.success(listOf(newsItem))
     private val errorResult: Result<List<NewsItem>> = Result.failure(Throwable("error"))
 

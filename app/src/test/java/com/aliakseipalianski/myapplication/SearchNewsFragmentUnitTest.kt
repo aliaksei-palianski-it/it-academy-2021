@@ -39,10 +39,10 @@ class SearchNewsFragmentUnitTest {
 
     private val searchedNewsItemList =
         listOf(
-            NewsItem("", "", "", "", "", ""),
-            NewsItem("", "", "", "", "", "")
+            NewsItem("", "", "", "", "", "", ""),
+            NewsItem("", "", "", "", "", "", "")
         )
-    private val newsItemList = listOf(NewsItem("", "", "", "", "", ""))
+    private val newsItemList = listOf(NewsItem("", "", "", "", "", "", ""))
     private val recentlySearchedItemList = listOf("")
 
     private lateinit var scenario: FragmentScenario<SearchNewsFragment>
