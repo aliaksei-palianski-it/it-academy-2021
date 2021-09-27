@@ -1,23 +1,32 @@
 package com.aliakseipalianski.myapplication.news.model
 
-import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedDao
 import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedItem
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import kotlin.random.Random
 
+interface ISearchNewsRepository {
+    suspend fun search(query: String): Result<List<NewsItem>>
+
+    suspend fun topHeadlines(): Result<List<NewsItem>>
+
+    suspend fun getAllRecentlySearched(): List<String>
+
+    suspend fun addQueryToRecentlySearched(query: String): List<String>
+}
 
 class SearchNewsRepository(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
     private val simpleDateFormat: SimpleDateFormat = SimpleDateFormat("yyyy.MM.dd")
-) {
+): ISearchNewsRepository {
 
     private var recentlySearchedList: List<String>? = null
 
-    suspend fun search(query: String): Result<List<NewsItem>> {
+    override suspend fun search(query: String): Result<List<NewsItem>> {
         return withContext(Dispatchers.IO) {
             runCatching {
                 newsService.searchAsync(query = query)
@@ -31,7 +40,7 @@ class SearchNewsRepository(
         }
     }
 
-    suspend fun topHeadlines(): Result<List<NewsItem>> {
+    override suspend fun topHeadlines(): Result<List<NewsItem>> {
         return withContext(Dispatchers.IO) {
             runCatching {
                 newsService.topHeadlinesAsync()
@@ -45,7 +54,7 @@ class SearchNewsRepository(
         }
     }
 
-    suspend fun addQueryToRecentlySearched(query: String): List<String> {
+    override suspend fun addQueryToRecentlySearched(query: String): List<String> {
         if (query.isNotBlank())
             withContext(Dispatchers.IO) {
                 insertInMemory(query)
@@ -64,7 +73,7 @@ class SearchNewsRepository(
         } ?: arrayListOf(query)
     }
 
-    suspend fun getAllRecentlySearched(): List<String> {
+    override suspend fun getAllRecentlySearched(): List<String> {
         if (recentlySearchedList == null) {
 
             recentlySearchedList = withContext(Dispatchers.IO) {

@@ -5,16 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aliakseipalianski.myapplication.common.App
+import com.aliakseipalianski.myapplication.news.model.ISearchNewsRepository
 import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(
+    private val searchNewsRepository: ISearchNewsRepository = SearchNewsRepository(
+        App.searchService,
+        App.getRecentlySearchedDao()
+    ),
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Main,
+) : ViewModel() {
 
-    private val searchNewsRepository =
-        SearchNewsRepository(App.searchService, App.getRecentlySearchedDao())
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         _errorLiveData.postValue(t.toString())
     }
@@ -38,7 +40,7 @@ class SearchViewModel : ViewModel() {
 
     fun search(text: String) {
         searchJob?.cancel()
-        searchJob = viewModelScope.launch(exceptionHandler) {
+        searchJob = viewModelScope.launch(dispatcher + exceptionHandler) {
             delay(1000)
 
             val newsResponse = if (text.isBlank()) {
@@ -62,7 +64,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun getRecentlySearched() {
-        viewModelScope.launch(exceptionHandler) {
+        viewModelScope.launch(dispatcher + exceptionHandler) {
             _historyLiveData.postValue(searchNewsRepository.getAllRecentlySearched())
         }
     }
