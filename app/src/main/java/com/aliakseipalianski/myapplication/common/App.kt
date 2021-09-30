@@ -9,12 +9,15 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+import com.aliakseipalianski.myapplication.news.model.database.MIGRATION_1_2
+
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
 
-        appDatabase = Room.databaseBuilder(this, AppDatabase::class.java, APP_DATABASE).build()
+        appDatabase = Room.databaseBuilder(this, AppDatabase::class.java, APP_DATABASE)
+            .addMigrations(MIGRATION_1_2).build()
     }
 
     companion object {

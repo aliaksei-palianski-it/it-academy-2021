@@ -6,7 +6,7 @@ import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import kotlin.random.Random
+import java.util.*
 
 interface ISearchNewsRepository {
     suspend fun search(query: String): Result<List<NewsItem>>
@@ -60,7 +60,13 @@ class SearchNewsRepository(
         if (query.isNotBlank())
             withContext(Dispatchers.IO) {
                 insertInMemory(query)
-                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+                recentlySearchedDao.insert(
+                    RecentlySearchedItem(
+                        UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                        query,
+                        (System.currentTimeMillis() / 1000L).toInt()
+                    )
+                )
             }
 
         return recentlySearchedList ?: emptyList()
