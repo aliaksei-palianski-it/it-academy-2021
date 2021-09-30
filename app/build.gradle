@@ -7,9 +7,10 @@ plugins {
 
 
 def room_version = "2.3.0"
+def koin_version = '3.1.2'
 
 android {
-    compileSdk 30
+    compileSdk 31
 
     defaultConfig {
         applicationId "com.aliakseipalianski.myapplication"
@@ -62,12 +63,17 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
+    implementation "io.insert-koin:koin-core:$koin_version"
+    implementation "io.insert-koin:koin-android:$koin_version"
+    testImplementation "io.insert-koin:koin-test:$koin_version"
+    testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    debugImplementation 'androidx.fragment:fragment-testing:1.4.0-alpha09'
      //broke instrumentation test debugImplementation 'androidx.fragment:fragment-testing:1.3.6'
     testImplementation 'androidx.test:core-ktx:1.4.0'
     testImplementation 'junit:junit:4.13.2'
@@ -79,13 +85,13 @@ dependencies {
     testImplementation "io.mockk:mockk:1.12.0"
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
-    testImplementation 'androidx.est.espresso:espresso-core:3.5.0-alpha01'
+    testImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha01'
     //
     testImplementation 'org.mockito:mockito-core:3.12.4'
     //
-    androidTestImplementation 'androidx.test:runner:1.4.0'
+ /*   androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0-alpha01'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha01'*/
 }

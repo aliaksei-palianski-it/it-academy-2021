@@ -21,7 +21,7 @@ interface ISearchNewsRepository {
 class SearchNewsRepository(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
-    private val simpleDateFormat: SimpleDateFormat = SimpleDateFormat("yyyy.MM.dd")
+    private val simpleDateFormat: SimpleDateFormat,
 ): ISearchNewsRepository {
 
     private var recentlySearchedList: List<String>? = null
