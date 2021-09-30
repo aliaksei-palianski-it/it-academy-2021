@@ -15,6 +15,8 @@ interface ISearchNewsRepository {
 
     suspend fun getAllRecentlySearched(): List<String>
 
+    suspend fun deleteAllRecentlySearched(): List<String>
+
     suspend fun addQueryToRecentlySearched(query: String): List<String>
 }
 
@@ -22,7 +24,7 @@ class SearchNewsRepository(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
     private val simpleDateFormat: SimpleDateFormat = SimpleDateFormat("yyyy.MM.dd")
-): ISearchNewsRepository {
+) : ISearchNewsRepository {
 
     private var recentlySearchedList: List<String>? = null
 
@@ -79,6 +81,19 @@ class SearchNewsRepository(
             recentlySearchedList = withContext(Dispatchers.IO) {
                 recentlySearchedDao.getAll().map { it.query }
             }
+        }
+
+        return recentlySearchedList ?: emptyList()
+    }
+
+    override suspend fun deleteAllRecentlySearched(): List<String> {
+        withContext(Dispatchers.IO) {
+            recentlySearchedDao.deleteAll()
+        }
+
+        recentlySearchedList = recentlySearchedList?.toMutableList()?.let { mutable ->
+            mutable.clear()
+            mutable
         }
 
         return recentlySearchedList ?: emptyList()

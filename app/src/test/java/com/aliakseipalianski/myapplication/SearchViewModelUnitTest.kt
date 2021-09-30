@@ -160,6 +160,10 @@ class SearchViewModelUnitTest {
             searchNewsRepository.addQueryToRecentlySearched(query)
         } returns recentlySearchedResult
 
+        coEvery {
+            searchNewsRepository.deleteAllRecentlySearched()
+        } returns emptyList()
+
         val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
         viewModel.search(query)
 
@@ -173,6 +177,8 @@ class SearchViewModelUnitTest {
         assertEquals(viewModel.errorLiveData.value, null)
 
         viewModel.clearHistory()
+
+        coVerify { searchNewsRepository.deleteAllRecentlySearched() }
 
         assertEquals(viewModel.historyLiveData.value, emptyList<String>())
     }

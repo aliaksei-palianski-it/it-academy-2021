@@ -14,4 +14,7 @@ interface RecentlySearchedDao {
 
     @Query("SELECT * FROM recently_searched")
     fun getAll(): List<RecentlySearchedItem>
+
+    @Query("DELETE FROM recently_searched")
+    fun deleteAll()
 }
