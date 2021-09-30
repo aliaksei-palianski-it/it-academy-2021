@@ -19,15 +19,15 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             """
                 CREATE TABLE new_recently_searched (
                     _id TEXT PRIMARY KEY NOT NULL,
-                    'query' TEXT NOT NULL,
-                    'timestamp' INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    query TEXT NOT NULL,
+                    timestamp INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
                 """.trimIndent()
         )
         database.execSQL(
             """
-                INSERT INTO new_recently_searched (_id, 'query')
-                SELECT CAST(_id AS TEXT), 'query' FROM recently_searched
+                INSERT INTO new_recently_searched (_id, query)
+                SELECT CAST(_id AS TEXT), query FROM recently_searched
                 """.trimIndent()
         )
         database.execSQL("DROP TABLE recently_searched")
