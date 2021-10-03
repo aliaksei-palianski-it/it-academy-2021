@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 
@@ -63,6 +64,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -81,6 +84,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
     //
     testImplementation 'org.mockito:mockito-core:3.12.4'
     //
