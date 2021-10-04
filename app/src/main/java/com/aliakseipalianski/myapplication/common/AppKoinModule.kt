@@ -7,12 +7,20 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 fun createAppModule() = module {
 
     factory { HttpClientProvider.createAppHttpClient() }
-    factory<ISearchNewsRepository> { SearchNewsRepository(get(), get(), get()) }
+    factory<ISearchNewsRepository> {
+        SearchNewsRepository(
+            get(),
+            get(),
+            get(qualifier = named("IO")),
+            get()
+        )
+    }
 
     single { RestApiProvider.createApi(get()) }
     single { AppDatabaseProvider.createAppDatabase(androidApplication()) }
@@ -20,8 +28,9 @@ fun createAppModule() = module {
         get<AppDatabase>().getRecentlySearchedDao()
     }
     single { DateFormatProvider.createYYYYMMDD() }
-    single<CoroutineDispatcher> { Dispatchers.Main }
+    single<CoroutineDispatcher>(named("Main")) { Dispatchers.Main }
+    single<CoroutineDispatcher>(named("IO")) { Dispatchers.IO }
 
-    viewModel { SearchViewModel(get(), get()) }
+    viewModel { SearchViewModel(get(), get(qualifier = named("Main"))) }
 }
 

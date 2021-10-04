@@ -19,9 +19,9 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
-import org.koin.test.KoinTest
 import org.koin.test.inject
 
 @ExperimentalCoroutinesApi
@@ -56,7 +56,7 @@ class SearchViewModelUnitTest : AutoCloseKoinTest() {
                 factory {
                     searchNewsRepository
                 }
-                single<CoroutineDispatcher> { testDispatcher }
+                single<CoroutineDispatcher>(named("Main")) { testDispatcher }
             }
             ),
             allowOverride = true
