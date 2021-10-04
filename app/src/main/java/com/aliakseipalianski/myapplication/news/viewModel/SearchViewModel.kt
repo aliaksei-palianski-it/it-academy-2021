@@ -4,17 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aliakseipalianski.myapplication.common.App
+import com.aliakseipalianski.myapplication.common.di.MainCoroutineDispatcher
 import com.aliakseipalianski.myapplication.news.model.ISearchNewsRepository
-import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class SearchViewModel(
-    private val searchNewsRepository: ISearchNewsRepository = SearchNewsRepository(
-        App.searchService,
-        App.getRecentlySearchedDao()
-    ),
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Main,
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val searchNewsRepository: ISearchNewsRepository,
+    @MainCoroutineDispatcher private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->

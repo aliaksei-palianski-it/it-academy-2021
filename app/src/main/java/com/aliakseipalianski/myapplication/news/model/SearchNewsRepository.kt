@@ -1,11 +1,15 @@
 package com.aliakseipalianski.myapplication.news.model
 
+import com.aliakseipalianski.myapplication.common.di.IOCoroutineDispatcher
+import com.aliakseipalianski.myapplication.common.di.YyyyMMddDateFormat
 import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedDao
 import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedItem
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 import kotlin.random.Random
 
 interface ISearchNewsRepository {
@@ -18,11 +22,12 @@ interface ISearchNewsRepository {
     suspend fun addQueryToRecentlySearched(query: String): List<String>
 }
 
-class SearchNewsRepository(
+class SearchNewsRepository @Inject constructor(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
-    private val simpleDateFormat: SimpleDateFormat = SimpleDateFormat("yyyy.MM.dd")
-): ISearchNewsRepository {
+    @YyyyMMddDateFormat private val simpleDateFormat: SimpleDateFormat,
+    @IOCoroutineDispatcher private val dispatcher: CoroutineDispatcher,
+) : ISearchNewsRepository {
 
     private var recentlySearchedList: List<String>? = null
 
