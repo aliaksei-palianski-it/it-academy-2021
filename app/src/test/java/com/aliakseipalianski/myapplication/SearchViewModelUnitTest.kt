@@ -1,6 +1,7 @@
 package com.aliakseipalianski.myapplication
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.aliakseipalianski.myapplication.dependency.KoinTestRuleProvider
 import com.aliakseipalianski.myapplication.news.model.ISearchNewsRepository
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.aliakseipalianski.myapplication.news.viewModel.SearchViewModel
@@ -8,17 +9,22 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertNotEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.koin.dsl.module
+import org.koin.test.AutoCloseKoinTest
+import org.koin.test.inject
 
 @ExperimentalCoroutinesApi
-class SearchViewModelUnitTest {
+class SearchViewModelUnitTest : AutoCloseKoinTest() {
 
     @ExperimentalCoroutinesApi
     private val testDispatcher = TestCoroutineDispatcher()
@@ -31,10 +37,30 @@ class SearchViewModelUnitTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    var koinTestRule = KoinTestRuleProvider.provide()
+
     private val searchNewsRepository: ISearchNewsRepository = mockk()
+    private val viewModel: SearchViewModel by inject()
+
     private val newsItem: NewsItem = NewsItem("", "", "", "", "", "", "")
     private val successResult = Result.success(listOf(newsItem))
     private val errorResult: Result<List<NewsItem>> = Result.failure(Throwable("error"))
+
+
+    @Before
+    fun init() {
+        koinTestRule.koin.loadModules(
+            listOf(module {
+                factory {
+                    searchNewsRepository
+                }
+                single<CoroutineDispatcher> { testDispatcher }
+            }
+            ),
+            allowOverride = true
+        )
+    }
 
     @ExperimentalCoroutinesApi
     @Test
@@ -49,8 +75,6 @@ class SearchViewModelUnitTest {
         coEvery {
             searchNewsRepository.addQueryToRecentlySearched(query)
         } returns recentlySearchedResult
-
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
 
         viewModel.search(query)
         delay(1000)
@@ -76,8 +100,6 @@ class SearchViewModelUnitTest {
             searchNewsRepository.addQueryToRecentlySearched(query)
         } returns emptyList()
 
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
-
         viewModel.search(query)
         delay(1000)
 
@@ -96,8 +118,6 @@ class SearchViewModelUnitTest {
         coEvery {
             searchNewsRepository.topHeadlines()
         } returns errorResult
-
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
 
         viewModel.search(query)
         delay(1000)
@@ -118,8 +138,6 @@ class SearchViewModelUnitTest {
             searchNewsRepository.topHeadlines()
         } throws Exception(errorMessage)
 
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
-
         viewModel.search(query)
         delay(1000)
 
@@ -138,7 +156,6 @@ class SearchViewModelUnitTest {
             searchNewsRepository.getAllRecentlySearched()
         } returns listOf(testQuery)
 
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
         viewModel.getRecentlySearched()
 
         coVerify { searchNewsRepository.getAllRecentlySearched() }
@@ -164,9 +181,7 @@ class SearchViewModelUnitTest {
             searchNewsRepository.deleteAllRecentlySearched()
         } returns emptyList()
 
-        val viewModel = SearchViewModel(searchNewsRepository, testDispatcher)
         viewModel.search(query)
-
         delay(1000)
 
         coVerify { searchNewsRepository.search(query) }

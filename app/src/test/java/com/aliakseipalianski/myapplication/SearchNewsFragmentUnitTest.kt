@@ -1,6 +1,7 @@
 package com.aliakseipalianski.myapplication
 
 import android.view.View
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
@@ -19,8 +20,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
+import org.koin.test.AutoCloseKoinTest
 import org.robolectric.annotation.Config
 
 /**
@@ -29,13 +34,13 @@ import org.robolectric.annotation.Config
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class SearchNewsFragmentUnitTest {
+class SearchNewsFragmentUnitTest : AutoCloseKoinTest() {
 
     private val historyMutableLiveData: MutableLiveData<List<String>> = MutableLiveData()
     private val newsItemMutableLiveData: MutableLiveData<List<NewsItem>> = MutableLiveData()
     private val errorMutableLiveData: MutableLiveData<String> = MutableLiveData()
 
-    private val viewModel: Lazy<SearchViewModel> = lazy { mockk() }
+    private val viewModel: SearchViewModel = mockk()
 
     private val searchedNewsItemList =
         listOf(
@@ -47,43 +52,53 @@ class SearchNewsFragmentUnitTest {
 
     private lateinit var scenario: FragmentScenario<SearchNewsFragment>
 
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
 
     @Config(application = App::class, packageName = "com.aliakseipalianski.myapplication")
     @Before
     fun initialisation() {
+        loadKoinModules(
+            module(override = true) {
+                factory {
+                    viewModel
+                }
+            }
+        )
+
         val fragment = SearchNewsFragment()
 
         scenario =
             launchFragmentInContainer(initialState = Lifecycle.State.INITIALIZED) { fragment }
-        fragment.viewModel = viewModel
 
         every {
-            viewModel.value.searchLiveData
+            viewModel.searchLiveData
         } returns newsItemMutableLiveData
 
         every {
-            viewModel.value.historyLiveData
+            viewModel.historyLiveData
         } returns historyMutableLiveData
 
         every {
-            viewModel.value.errorLiveData
+            viewModel.errorLiveData
         } returns errorMutableLiveData
 
         every {
-            viewModel.value.getRecentlySearched()
+            viewModel.getRecentlySearched()
         } answers {
             historyMutableLiveData.value = recentlySearchedItemList
         }
 
         every {
-            viewModel.value.search("")
+            viewModel.search("")
         } answers {
             newsItemMutableLiveData.value = newsItemList
             historyMutableLiveData.value = recentlySearchedItemList
         }
 
         every {
-            viewModel.value.clearHistory()
+            viewModel.clearHistory()
         } answers {
             historyMutableLiveData.value = emptyList()
         }
@@ -104,7 +119,7 @@ class SearchNewsFragmentUnitTest {
         val query = "qqq"
 
         every {
-            viewModel.value.search("")
+            viewModel.search("")
         } answers {
             newsItemMutableLiveData.value = newsItemList
             historyMutableLiveData.value = emptyList()
@@ -125,7 +140,7 @@ class SearchNewsFragmentUnitTest {
         }
 
         every {
-            viewModel.value.search(query)
+            viewModel.search(query)
         } answers {
             newsItemMutableLiveData.value = searchedNewsItemList
             historyMutableLiveData.value = recentlySearchedItemList
@@ -151,13 +166,13 @@ class SearchNewsFragmentUnitTest {
         val query = ""
 
         every {
-            viewModel.value.getRecentlySearched()
+            viewModel.getRecentlySearched()
         } answers {
             historyMutableLiveData.value = emptyList()
         }
 
         every {
-            viewModel.value.search("")
+            viewModel.search("")
         } answers {
             newsItemMutableLiveData.value = newsItemList
             historyMutableLiveData.value = emptyList()
@@ -166,8 +181,8 @@ class SearchNewsFragmentUnitTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         verify {
-            viewModel.value.getRecentlySearched()
-            viewModel.value.search(query)
+            viewModel.getRecentlySearched()
+            viewModel.search(query)
         }
 
         onView(withId(R.id.historyRecycler)).check { view, _ ->
@@ -186,8 +201,8 @@ class SearchNewsFragmentUnitTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         verify {
-            viewModel.value.getRecentlySearched()
-            viewModel.value.search(query)
+            viewModel.getRecentlySearched()
+            viewModel.search(query)
         }
 
         onView(withId(R.id.historyRecycler)).check { view, _ ->
@@ -215,7 +230,7 @@ class SearchNewsFragmentUnitTest {
         onView(withId(R.id.clearHistory)).perform(ViewActions.click())
 
         verify {
-            viewModel.value.clearHistory()
+            viewModel.clearHistory()
         }
 
         onView(withId(R.id.historyRecycler)).check { view, _ ->
