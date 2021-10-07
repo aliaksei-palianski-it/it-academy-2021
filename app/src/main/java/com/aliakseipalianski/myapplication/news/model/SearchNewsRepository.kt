@@ -5,10 +5,10 @@ import com.aliakseipalianski.core.recentlySearch.db.RecentlySearchedItem
 import com.aliakseipalianski.core.recentlySearch.network.NewsService
 import com.aliakseipalianski.myapplication.common.toNewsItem
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import kotlin.random.Random
+import java.util.*
 
 interface ISearchNewsRepository {
     suspend fun search(query: String): Result<List<NewsItem>>
@@ -17,19 +17,25 @@ interface ISearchNewsRepository {
 
     suspend fun getAllRecentlySearched(): List<String>
 
-    suspend fun addQueryToRecentlySearched(query: String): List<String>
+    suspend fun deleteAllRecentlySearched(): List<String>
+
+    suspend fun addQueryToRecentlySearched(
+        query: String,
+        timestamp: Int = (System.currentTimeMillis() / 1000L).toInt()
+    ): List<String>
 }
 
 class SearchNewsRepository(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
+    private val dispatcher: CoroutineDispatcher,
     private val simpleDateFormat: SimpleDateFormat,
-): ISearchNewsRepository {
+) : ISearchNewsRepository {
 
     private var recentlySearchedList: List<String>? = null
 
     override suspend fun search(query: String): Result<List<NewsItem>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             runCatching {
                 newsService.searchAsync(query = query)
                     .await()
@@ -43,7 +49,7 @@ class SearchNewsRepository(
     }
 
     override suspend fun topHeadlines(): Result<List<NewsItem>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             runCatching {
                 newsService.topHeadlinesAsync()
                     .await()
@@ -56,11 +62,17 @@ class SearchNewsRepository(
         }
     }
 
-    override suspend fun addQueryToRecentlySearched(query: String): List<String> {
+    override suspend fun addQueryToRecentlySearched(query: String, timestamp: Int): List<String> {
         if (query.isNotBlank())
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher) {
                 insertInMemory(query)
-                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+                recentlySearchedDao.insert(
+                    RecentlySearchedItem(
+                        UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                        query,
+                        timestamp
+                    )
+                )
             }
 
         return recentlySearchedList ?: emptyList()
@@ -78,9 +90,22 @@ class SearchNewsRepository(
     override suspend fun getAllRecentlySearched(): List<String> {
         if (recentlySearchedList == null) {
 
-            recentlySearchedList = withContext(Dispatchers.IO) {
+            recentlySearchedList = withContext(dispatcher) {
                 recentlySearchedDao.getAll().map { it.query }
             }
+        }
+
+        return recentlySearchedList ?: emptyList()
+    }
+
+    override suspend fun deleteAllRecentlySearched(): List<String> {
+        withContext(dispatcher) {
+            recentlySearchedDao.deleteAll()
+        }
+
+        recentlySearchedList = recentlySearchedList?.toMutableList()?.let { mutable ->
+            mutable.clear()
+            mutable
         }
 
         return recentlySearchedList ?: emptyList()
