@@ -17,7 +17,10 @@ interface ISearchNewsRepository {
 
     suspend fun deleteAllRecentlySearched(): List<String>
 
-    suspend fun addQueryToRecentlySearched(query: String): List<String>
+    suspend fun addQueryToRecentlySearched(
+        query: String,
+        timestamp: Int = (System.currentTimeMillis() / 1000L).toInt()
+    ): List<String>
 }
 
 class SearchNewsRepository(
@@ -57,7 +60,7 @@ class SearchNewsRepository(
         }
     }
 
-    override suspend fun addQueryToRecentlySearched(query: String): List<String> {
+    override suspend fun addQueryToRecentlySearched(query: String, timestamp: Int): List<String> {
         if (query.isNotBlank())
             withContext(dispatcher) {
                 insertInMemory(query)
@@ -65,7 +68,7 @@ class SearchNewsRepository(
                     RecentlySearchedItem(
                         UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
                         query,
-                        (System.currentTimeMillis() / 1000L).toInt()
+                        timestamp
                     )
                 )
             }

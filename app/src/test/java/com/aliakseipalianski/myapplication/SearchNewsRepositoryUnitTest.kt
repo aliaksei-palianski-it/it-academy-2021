@@ -18,7 +18,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.inject
-import kotlin.random.Random
+import java.util.*
 import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
@@ -48,9 +48,7 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
         koinTestRule.koin.loadModules(
             listOf(module {
                 single { newsService }
-                single {
-                    recentlySearchedDao
-                }
+                single { recentlySearchedDao }
                 single<CoroutineDispatcher>(named("IO")) { testDispatcher }
             }
             ),
@@ -58,45 +56,62 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
         )
     }
 
-    //Can't mock a function that uses random
     @ExperimentalCoroutinesApi
     @Test
     fun `add query to recently searched - case when query is not blank`() =
         testScope.runBlockingTest {
             val query = "test"
-            val recentlySearchedItem = RecentlySearchedItem(Random.nextInt(), query)
+            val recentlySearchedItem = RecentlySearchedItem(
+                UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                query,
+                (System.currentTimeMillis() / 1000L).toInt()
+            )
 
             coEvery {
                 recentlySearchedDao.insert(recentlySearchedItem)
             } just Runs
 
-            assertEquals(listOf(query), searchNewsRepository.addQueryToRecentlySearched(query))
+            assertEquals(
+                listOf(query),
+                searchNewsRepository.addQueryToRecentlySearched(
+                    query,
+                    recentlySearchedItem.timestamp
+                )
+            )
 
             coVerify {
                 recentlySearchedDao.insert(recentlySearchedItem)
             }
         }
 
-    //Can't mock a function that uses random
     @ExperimentalCoroutinesApi
     @Test
     fun `add query to recently searched - case when query is blank`() =
         testScope.runBlockingTest {
             val query = " "
-            val recentlySearchedItem = RecentlySearchedItem(Random.nextInt(), query)
+            val recentlySearchedItem = RecentlySearchedItem(
+                UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                query,
+                (System.currentTimeMillis() / 1000L).toInt()
+            )
 
             coEvery {
                 recentlySearchedDao.insert(recentlySearchedItem)
             } just Runs
 
-            assertEquals(emptyList(), searchNewsRepository.addQueryToRecentlySearched(query))
+            assertEquals(
+                emptyList(),
+                searchNewsRepository.addQueryToRecentlySearched(
+                    query,
+                    recentlySearchedItem.timestamp
+                )
+            )
 
             coVerify(exactly = 0) {
                 recentlySearchedDao.insert(recentlySearchedItem)
             }
         }
 
-    //Can't mock a function that uses random
     @ExperimentalCoroutinesApi
     @Test
     fun `the query that contains already in memory will be moved to the beginning`() =
@@ -104,8 +119,16 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
             val query = "Apple"
             val query2 = "Google"
 
-            val recentlySearchedItem = RecentlySearchedItem(Random.nextInt(), query)
-            val recentlySearchedItem2 = RecentlySearchedItem(Random.nextInt(), query2)
+            val recentlySearchedItem = RecentlySearchedItem(
+                UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                query,
+                (System.currentTimeMillis() / 1000L).toInt()
+            )
+            val recentlySearchedItem2 = RecentlySearchedItem(
+                UUID.nameUUIDFromBytes(query2.toByteArray()).toString(),
+                query2,
+                (System.currentTimeMillis() / 1000L).toInt()
+            )
 
             coEvery {
                 recentlySearchedDao.insert(recentlySearchedItem)
@@ -115,7 +138,13 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
                 recentlySearchedDao.insert(recentlySearchedItem2)
             } just Runs
 
-            assertEquals(listOf(query), searchNewsRepository.addQueryToRecentlySearched(query))
+            assertEquals(
+                listOf(query),
+                searchNewsRepository.addQueryToRecentlySearched(
+                    query,
+                    recentlySearchedItem.timestamp
+                )
+            )
 
             coVerify {
                 recentlySearchedDao.insert(recentlySearchedItem)
@@ -123,11 +152,17 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
 
             assertEquals(
                 listOf(query2, query),
-                searchNewsRepository.addQueryToRecentlySearched(query2)
+                searchNewsRepository.addQueryToRecentlySearched(
+                    query2,
+                    recentlySearchedItem2.timestamp
+                )
             )
             assertEquals(
                 listOf(query, query2),
-                searchNewsRepository.addQueryToRecentlySearched(query)
+                searchNewsRepository.addQueryToRecentlySearched(
+                    query,
+                    recentlySearchedItem.timestamp
+                )
             )
         }
 
@@ -135,9 +170,20 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
     @Test
     fun `get all recently searched - case when recentlySearchedList equals null`() =
         testScope.runBlockingTest {
+            val query = "Apple"
+            val query2 = "Google"
+
             val recentlySearchedList = listOf(
-                RecentlySearchedItem(Random.nextInt(), "test"),
-                RecentlySearchedItem(Random.nextInt(), "test2")
+                RecentlySearchedItem(
+                    UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                    query,
+                    (System.currentTimeMillis() / 1000L).toInt()
+                ),
+                RecentlySearchedItem(
+                    UUID.nameUUIDFromBytes(query2.toByteArray()).toString(),
+                    query2,
+                    (System.currentTimeMillis() / 1000L).toInt()
+                )
             )
 
             coEvery {
@@ -151,6 +197,24 @@ class SearchNewsRepositoryUnitTest : AutoCloseKoinTest() {
 
             coVerify {
                 recentlySearchedDao.getAll()
+            }
+        }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `delete all recently searched`() =
+        testScope.runBlockingTest {
+            coEvery {
+                recentlySearchedDao.deleteAll()
+            } just Runs
+
+            assertEquals(
+                emptyList(),
+                searchNewsRepository.deleteAllRecentlySearched()
+            )
+
+            coVerify {
+                recentlySearchedDao.deleteAll()
             }
         }
 
