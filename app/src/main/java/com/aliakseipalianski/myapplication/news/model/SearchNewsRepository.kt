@@ -6,7 +6,7 @@ import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import kotlin.random.Random
+import java.util.*
 
 interface ISearchNewsRepository {
     suspend fun search(query: String): Result<List<NewsItem>>
@@ -14,6 +14,8 @@ interface ISearchNewsRepository {
     suspend fun topHeadlines(): Result<List<NewsItem>>
 
     suspend fun getAllRecentlySearched(): List<String>
+
+    suspend fun deleteAllRecentlySearched(): List<String>
 
     suspend fun addQueryToRecentlySearched(query: String): List<String>
 }
@@ -59,7 +61,13 @@ class SearchNewsRepository(
         if (query.isNotBlank())
             withContext(dispatcher) {
                 insertInMemory(query)
-                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+                recentlySearchedDao.insert(
+                    RecentlySearchedItem(
+                        UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                        query,
+                        (System.currentTimeMillis() / 1000L).toInt()
+                    )
+                )
             }
 
         return recentlySearchedList ?: emptyList()
@@ -80,6 +88,19 @@ class SearchNewsRepository(
             recentlySearchedList = withContext(dispatcher) {
                 recentlySearchedDao.getAll().map { it.query }
             }
+        }
+
+        return recentlySearchedList ?: emptyList()
+    }
+
+    override suspend fun deleteAllRecentlySearched(): List<String> {
+        withContext(dispatcher) {
+            recentlySearchedDao.deleteAll()
+        }
+
+        recentlySearchedList = recentlySearchedList?.toMutableList()?.let { mutable ->
+            mutable.clear()
+            mutable
         }
 
         return recentlySearchedList ?: emptyList()

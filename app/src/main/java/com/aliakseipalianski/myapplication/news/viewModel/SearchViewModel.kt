@@ -65,11 +65,8 @@ class SearchViewModel(
     }
 
     fun clearHistory() {
-        _historyLiveData.value?.let {
-            it.toMutableList().let { mutable ->
-                mutable.clear()
-                _historyLiveData.postValue(mutable)
-            }
+        viewModelScope.launch(dispatcher + exceptionHandler) {
+            _historyLiveData.postValue(searchNewsRepository.deleteAllRecentlySearched())
         }
     }
 }

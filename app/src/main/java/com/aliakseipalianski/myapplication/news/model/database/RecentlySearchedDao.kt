@@ -12,6 +12,9 @@ interface RecentlySearchedDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(recentlySearchedItemList: RecentlySearchedItem)
 
-    @Query("SELECT * FROM recently_searched")
+    @Query("SELECT * FROM recently_searched ORDER BY timestamp DESC")
     fun getAll(): List<RecentlySearchedItem>
+
+    @Query("DELETE FROM recently_searched")
+    fun deleteAll()
 }
