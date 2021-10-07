@@ -6,7 +6,7 @@ import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import kotlin.random.Random
+import java.util.*
 
 interface ISearchNewsRepository {
     suspend fun search(query: String): Result<List<NewsItem>>
@@ -15,6 +15,8 @@ interface ISearchNewsRepository {
 
     suspend fun getAllRecentlySearched(): List<String>
 
+    suspend fun deleteAllRecentlySearched(): List<String>
+
     suspend fun addQueryToRecentlySearched(query: String): List<String>
 }
 
@@ -22,8 +24,7 @@ class SearchNewsRepository(
     private val newsService: NewsService,
     private val recentlySearchedDao: RecentlySearchedDao,
     private val simpleDateFormat: SimpleDateFormat,
-): ISearchNewsRepository {
-
+) : ISearchNewsRepository {
     private var recentlySearchedList: List<String>? = null
 
     override suspend fun search(query: String): Result<List<NewsItem>> {
@@ -58,7 +59,13 @@ class SearchNewsRepository(
         if (query.isNotBlank())
             withContext(Dispatchers.IO) {
                 insertInMemory(query)
-                recentlySearchedDao.insert(RecentlySearchedItem(Random.nextInt(), query))
+                recentlySearchedDao.insert(
+                    RecentlySearchedItem(
+                        UUID.nameUUIDFromBytes(query.toByteArray()).toString(),
+                        query,
+                        (System.currentTimeMillis() / 1000L).toInt()
+                    )
+                )
             }
 
         return recentlySearchedList ?: emptyList()
@@ -79,6 +86,19 @@ class SearchNewsRepository(
             recentlySearchedList = withContext(Dispatchers.IO) {
                 recentlySearchedDao.getAll().map { it.query }
             }
+        }
+
+        return recentlySearchedList ?: emptyList()
+    }
+
+    override suspend fun deleteAllRecentlySearched(): List<String> {
+        withContext(Dispatchers.IO) {
+            recentlySearchedDao.deleteAll()
+        }
+
+        recentlySearchedList = recentlySearchedList?.toMutableList()?.let { mutable ->
+            mutable.clear()
+            mutable
         }
 
         return recentlySearchedList ?: emptyList()

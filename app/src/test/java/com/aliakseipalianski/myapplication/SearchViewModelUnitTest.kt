@@ -21,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
-import org.koin.test.KoinTest
 import org.koin.test.inject
 
 @ExperimentalCoroutinesApi
@@ -178,8 +177,11 @@ class SearchViewModelUnitTest : AutoCloseKoinTest() {
             searchNewsRepository.addQueryToRecentlySearched(query)
         } returns recentlySearchedResult
 
-        viewModel.search(query)
+        coEvery {
+            searchNewsRepository.deleteAllRecentlySearched()
+        } returns emptyList()
 
+        viewModel.search(query)
         delay(1000)
 
         coVerify { searchNewsRepository.search(query) }
@@ -190,6 +192,8 @@ class SearchViewModelUnitTest : AutoCloseKoinTest() {
         assertEquals(viewModel.errorLiveData.value, null)
 
         viewModel.clearHistory()
+
+        coVerify { searchNewsRepository.deleteAllRecentlySearched() }
 
         assertEquals(viewModel.historyLiveData.value, emptyList<String>())
     }
