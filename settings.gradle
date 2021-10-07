@@ -8,3 +8,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "IT academy"
 include ':app'
+include ':myapplication'
+include ':core'

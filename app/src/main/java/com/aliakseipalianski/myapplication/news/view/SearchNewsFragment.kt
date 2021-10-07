@@ -29,6 +29,8 @@ class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
             viewModel.search("")
         }
 
+        SearchDebugTools().makeSomething()
+
         viewModel.searchLiveData.observe(viewLifecycleOwner) {
             (newsRecycler.adapter as? SearchNewsAdapter)?.submitList(it)
         }

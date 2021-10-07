@@ -18,8 +18,4 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFil
-
--assumenosideeffects class com.aliakseipalianski.myapplication.news.view.SearchDebugTools {
-    public makeSomething();
-}
+#-renamesourcefileattribute SourceFile

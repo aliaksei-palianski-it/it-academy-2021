@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">IT academy</string>
+    <string name="app_name">Айти академи па беларуски</string>
 
     <string name="null_url_error" type="id">Sorry. Maybe try again later</string>
-
 </resources>

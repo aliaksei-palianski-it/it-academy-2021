@@ -11,7 +11,6 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.aliakseipalianski.myapplication.common.App
 import com.aliakseipalianski.myapplication.news.view.SearchNewsFragment
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.aliakseipalianski.myapplication.news.viewModel.SearchViewModel

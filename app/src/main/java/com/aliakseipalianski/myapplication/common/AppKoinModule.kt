@@ -1,5 +1,8 @@
 package com.aliakseipalianski.myapplication.common
 
+import com.aliakseipalianski.core.DateFormatProvider
+import com.aliakseipalianski.core.HttpClientProvider
+import com.aliakseipalianski.core.RestApiProvider
 import com.aliakseipalianski.myapplication.news.model.ISearchNewsRepository
 import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
 import com.aliakseipalianski.myapplication.news.viewModel.SearchViewModel
@@ -11,17 +14,7 @@ import org.koin.dsl.module
 
 fun createAppModule() = module {
 
-    factory { HttpClientProvider.createAppHttpClient() }
     factory<ISearchNewsRepository> { SearchNewsRepository(get(), get(), get()) }
-
-    single { RestApiProvider.createApi(get()) }
-    single { AppDatabaseProvider.createAppDatabase(androidApplication()) }
-    single {
-        get<AppDatabase>().getRecentlySearchedDao()
-    }
-    single { DateFormatProvider.createYYYYMMDD() }
-    single<CoroutineDispatcher> { Dispatchers.Main }
-
     viewModel { SearchViewModel(get(), get()) }
 }
 

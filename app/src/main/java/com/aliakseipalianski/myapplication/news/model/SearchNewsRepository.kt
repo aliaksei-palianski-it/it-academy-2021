@@ -1,7 +1,9 @@
 package com.aliakseipalianski.myapplication.news.model
 
-import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedDao
-import com.aliakseipalianski.myapplication.news.model.database.RecentlySearchedItem
+import com.aliakseipalianski.core.recentlySearch.db.RecentlySearchedDao
+import com.aliakseipalianski.core.recentlySearch.db.RecentlySearchedItem
+import com.aliakseipalianski.core.recentlySearch.network.NewsService
+import com.aliakseipalianski.myapplication.common.toNewsItem
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

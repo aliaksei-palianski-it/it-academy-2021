@@ -1,5 +1,8 @@
 package com.aliakseipalianski.myapplication.dependency
 
+import com.aliakseipalianski.core.DateFormatProvider
+import com.aliakseipalianski.core.HttpClientProvider
+import com.aliakseipalianski.core.RestApiProvider
 import com.aliakseipalianski.myapplication.common.*
 import com.aliakseipalianski.myapplication.news.model.ISearchNewsRepository
 import com.aliakseipalianski.myapplication.news.model.SearchNewsRepository
