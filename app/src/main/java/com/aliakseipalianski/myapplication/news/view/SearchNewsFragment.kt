@@ -3,15 +3,25 @@ package com.aliakseipalianski.myapplication.news.view
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.aliakseipalianski.myapplication.R
+import com.aliakseipalianski.myapplication.news.view.LikeButton.DISABLED
+import com.aliakseipalianski.myapplication.news.view.LikeButton.ENABLED
 import com.aliakseipalianski.myapplication.news.view.adapter.HistoryRecyclerViewAdapter
 import com.aliakseipalianski.myapplication.news.view.adapter.SearchNewsAdapter
 import com.aliakseipalianski.myapplication.news.viewModel.SearchViewModel
 import kotlinx.android.synthetic.main.framgent_news_search.*
+import kotlinx.android.synthetic.main.item_search_news.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
+object LikeButton {
+    const val DISABLED = "disabled"
+    const val ENABLED = "enabled"
+}
 
 class SearchNewsFragment : Fragment(R.layout.framgent_news_search) {
 

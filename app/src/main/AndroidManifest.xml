@@ -26,9 +26,6 @@
             <intent-filter>
                 <data android:scheme="${scheme}" />
             </intent-filter>
-
         </activity>
-
     </application>
-
 </manifest>

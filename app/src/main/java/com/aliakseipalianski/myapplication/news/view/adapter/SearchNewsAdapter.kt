@@ -3,12 +3,15 @@ package com.aliakseipalianski.myapplication.news.view.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aliakseipalianski.myapplication.R
+import com.aliakseipalianski.myapplication.news.view.LikeButton
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.bumptech.glide.Glide
 
@@ -42,12 +45,35 @@ class SearchNewsAdapter(
         private val description: TextView = view.findViewById(R.id.itemDescription)
         private val author: TextView = view.findViewById(R.id.itemAuthor)
         private val date: TextView = view.findViewById(R.id.itemDate)
+        private val likeButton: ImageButton = view.findViewById(R.id.likeButton)
 
         fun bind(item: NewsItem, onClickListener: View.OnClickListener) {
             author.text = item.author
             description.text = item.description
             date.text = item.publishedAt
             title.text = item.title
+            likeButton.setOnClickListener {
+                when (likeButton.tag) {
+                    LikeButton.DISABLED -> {
+                        likeButton.setColorFilter(
+                            ContextCompat.getColor(
+                                likeButton.context,
+                                android.R.color.holo_orange_light
+                            )
+                        )
+                        likeButton.tag = LikeButton.ENABLED
+                    }
+                    LikeButton.ENABLED -> {
+                        likeButton.setColorFilter(
+                            ContextCompat.getColor(
+                                likeButton.context,
+                                android.R.color.darker_gray
+                            )
+                        )
+                        likeButton.tag = LikeButton.DISABLED
+                    }
+                }
+            }
 
             Glide
                 .with(itemView.context.applicationContext)

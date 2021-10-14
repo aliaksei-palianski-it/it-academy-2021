@@ -2,11 +2,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="4dp">
+    android:padding="8dp"
+    android:clipToPadding="false">
 
     <TextView
+        android:translationZ="2dp"
+        android:elevation="2dp"
         android:id="@+id/query"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_search_query" />
+        android:background="@drawable/rotated_bg_search_query" />
 </FrameLayout>
