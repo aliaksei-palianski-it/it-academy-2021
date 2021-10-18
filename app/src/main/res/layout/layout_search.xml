@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:autofillHints="search"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/historyRecycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/historyRecycler"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
+        app:layout_constraintEnd_toStartOf="@+id/clearHistory"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput"
+        tools:listitem="@layout/search_query_item" />
+
+    <ImageView
+        android:id="@+id/clearHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/historyRecycler"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput"
+        app:srcCompat="@drawable/ic_round_clear_24" />
+</merge>
