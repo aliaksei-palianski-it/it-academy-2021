@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import com.aliakseipalianski.myapplication.R
 import kotlinx.android.synthetic.main.layout_search.view.*
@@ -24,7 +25,8 @@ class NewsSearchView(
 
     init {
         init(
-            context
+            context,
+            attrs
         )
     }
 
@@ -57,10 +59,31 @@ class NewsSearchView(
     )
 
     private fun init(
-        context: Context
+        context: Context,
+        attrs: AttributeSet?,
     ) {
         LayoutInflater.from(context).inflate(R.layout.layout_search, this, true)
         setupHistoryAdapter()
+
+        attrs?.let {
+            val typedArray = resources.obtainAttributes(attrs, R.styleable.NewsSearchView)
+
+            typedArray.getColor(
+                R.styleable.NewsSearchView_cleanButtonColor,
+                ContextCompat.getColor(context, R.color.black)
+            ).let {
+                clearHistory.setColorFilter(it)
+            }
+
+            typedArray.getResourceId(
+                R.styleable.NewsSearchView_clearButtonSrc,
+                R.drawable.ic_round_clear_24
+            ).let {
+                clearHistory.setImageResource(it)
+            }
+
+            typedArray.recycle()
+        }
     }
 
     fun updateHistoryList(history: List<String>) {

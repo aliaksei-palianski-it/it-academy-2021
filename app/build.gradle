@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.aliakseipalianski.myapplication"
         minSdk 22
-        targetSdk 30
+        targetSdk 31
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

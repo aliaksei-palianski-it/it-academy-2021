@@ -40,6 +40,5 @@
         app:layout_constraintBottom_toTopOf="@+id/newsRecycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/historyRecycler"
-        app:layout_constraintTop_toBottomOf="@+id/searchInput"
-        app:srcCompat="@drawable/ic_round_clear_24" />
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
 </merge>

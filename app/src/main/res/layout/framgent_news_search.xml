@@ -10,6 +10,8 @@
         android:id="@+id/newsSearchView"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:visibility="gone"
+        app:clearButtonSrc="@drawable/ic_baseline_delete_forever_24"
         tools:layout="@layout/layout_search" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,4 +23,5 @@
         android:paddingTop="8dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
 </LinearLayout>

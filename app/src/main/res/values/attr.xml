@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="NewsSearchView">
+        <attr name="clearButtonSrc" format="reference" />
+        <attr name="cleanButtonColor" format="color" />
+    </declare-styleable>
+</resources>
