@@ -1,5 +1,6 @@
 package com.aliakseipalianski.myapplication.news.view.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +15,13 @@ import com.aliakseipalianski.myapplication.R
 import com.aliakseipalianski.myapplication.news.view.LikeButton
 import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 
 class SearchNewsAdapter(
+    private val onLoaded: () -> Unit,
     private val onClickListener: View.OnClickListener
 ) :
     ListAdapter<NewsItem, SearchNewsAdapter.SearchNewsItemViewHolder>(SearchNewsItemDiff) {
@@ -28,17 +34,19 @@ class SearchNewsAdapter(
             R.layout.item_search_news,
             parent,
             false
-        )
+        ),
+        onLoaded
     )
 
     override fun onBindViewHolder(
         holder: SearchNewsItemViewHolder,
         position: Int
     ) {
-        holder.bind(getItem(position), onClickListener)
+        holder.bind(getItem(position), onClickListener, position)
     }
 
-    class SearchNewsItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class SearchNewsItemViewHolder(view: View, val onLoaded: () -> Unit) :
+        RecyclerView.ViewHolder(view) {
 
         private val poster: ImageView = view.findViewById(R.id.itemPoster)
         private val title: TextView = view.findViewById(R.id.itemTitle)
@@ -47,7 +55,10 @@ class SearchNewsAdapter(
         private val date: TextView = view.findViewById(R.id.itemDate)
         private val likeButton: ImageButton = view.findViewById(R.id.likeButton)
 
-        fun bind(item: NewsItem, onClickListener: View.OnClickListener) {
+        fun bind(item: NewsItem, onClickListener: View.OnClickListener, position: Int) {
+            poster.transitionName = "timage$position"
+            description.transitionName = "ttext$position"
+            title.transitionName = "ttitle$position"
             author.text = item.author
             description.text = item.description
             date.text = item.publishedAt
@@ -79,11 +90,34 @@ class SearchNewsAdapter(
                 .with(itemView.context.applicationContext)
                 .load(item.urlToImage)
                 .fallback(R.mipmap.ic_launcher)
-                .placeholder(R.mipmap.ic_launcher_round)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        onLoaded.invoke()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        onLoaded.invoke()
+                        return false
+                    }
+
+                })
                 .into(poster)
 
             with(itemView) {
-                tag = item.url
+                tag = item
+
                 setOnClickListener(onClickListener)
             }
         }

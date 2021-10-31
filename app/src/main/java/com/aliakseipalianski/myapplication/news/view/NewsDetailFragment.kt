@@ -1,73 +1,121 @@
 package com.aliakseipalianski.myapplication.news.view
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.MenuItem
 import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.Toast
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.core.os.bundleOf
-import com.aliakseipalianski.myapplication.BuildConfig
+import androidx.fragment.app.Fragment
 import com.aliakseipalianski.myapplication.R
+import com.aliakseipalianski.myapplication.news.viewModel.NewsItem
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import kotlinx.android.synthetic.main.fragment_news_detail.*
 
-private const val ARG_URL = "url"
+private const val ARG_ITEM = "item"
+private const val ARG_TRANSTITION_NAME = "transtition_name"
+private const val ARG_TRANSTITION_NAME_TEXT = "transtition_name_txt"
+private const val ARG_TRANSTITION_NAME_TITLE = "transtition_name_title"
 
 class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
 
-    private var url: String? = null
+    private var item: NewsItem? = null
+    private var tn: String? = null
+    private var tn1: String? = null
+    private var tn2: String? = null
 
     companion object {
-        fun newInstance(url: String) =
+        fun newInstance(
+            item: NewsItem,
+            transitionName: String,
+            transitionName1: String,
+            transitionName2: String
+        ) =
             NewsDetailFragment().apply {
-                arguments = bundleOf(ARG_URL to url)
+                arguments = bundleOf(
+                    ARG_ITEM to item,
+                    ARG_TRANSTITION_NAME to transitionName,
+                    ARG_TRANSTITION_NAME_TEXT to transitionName1,
+                    ARG_TRANSTITION_NAME_TITLE to transitionName2,
+                )
             }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            url = it.getString(ARG_URL)
+            item = it.getSerializable(ARG_ITEM) as? NewsItem
+            tn = it.getString(ARG_TRANSTITION_NAME)
+            tn1 = it.getString(ARG_TRANSTITION_NAME_TEXT)
+            tn2 = it.getString(ARG_TRANSTITION_NAME_TITLE)
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    private fun prepareSharedElementTransition() {
+        val transition = TransitionInflater.from(
+            context
+        ).inflateTransition(R.transition.image_shared_element_transition)
+        sharedElementEnterTransition = transition
+    }
+
+    @SuppressLint("SetJavaScriptEnabled", "SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        url?.let {
-            with(webView) {
-                webViewClient = object : WebViewClient() {
+        details_image.transitionName = tn
+        details_text.transitionName = tn1
+        title_text.transitionName = tn2
 
-                    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                        super.onPageStarted(view, url, favicon)
-                        progressBar?.visibility = View.VISIBLE
+        prepareSharedElementTransition()
 
+//        if (savedInstanceState == null) {
+        postponeEnterTransition()
+        //      }
+
+        item?.let {
+            Glide
+                .with(details_image.context.applicationContext)
+                .load(it.urlToImage)
+                .fallback(R.mipmap.ic_launcher)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
                     }
 
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        super.onPageFinished(view, url)
-                        if (this@NewsDetailFragment.url == url)
-                            progressBar?.visibility = View.GONE
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
                     }
                 }
+                )
 
-                settings.javaScriptEnabled = true
-                loadUrl(it)
-            }
-        } ?: run {
-            if (BuildConfig.DEBUG) {
-                throw IllegalArgumentException("url == null")
-            } else {
-                Toast.makeText(context, R.string.null_url_error, Toast.LENGTH_SHORT).show()
-            }
+                .into(details_image)
+
+            title_text.text = it.title
+            details_text.text = it.description + it.description + it.description + it.description
         }
     }
 
